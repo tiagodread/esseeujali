@@ -1,6 +1,7 @@
 package View;
 
 import DAO.LivroDAO;
+import DAO.UsuarioDAO;
 import Panels.Livro;
 import java.awt.ComponentOrientation;
 import java.sql.ResultSet;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -23,17 +25,22 @@ import javax.swing.JOptionPane;
 public final class Principal extends javax.swing.JFrame {
 
     private final LivroDAO ldao = new LivroDAO();
+    private final UsuarioDAO udao = new UsuarioDAO();
     private final List<Integer> myLivros = new ArrayList<>();
     private final int idUser;
+    private final String nome;
 
     /**
      * Creates new form Principal
      *
      * @param idUsuario
+     * @param nome
      */
-    public Principal(int idUsuario) {
+    public Principal(int idUsuario, String nome) {
         initComponents();
+        getTop10();
         this.idUser = idUsuario;
+        this.nome = nome;
         getLivrosLidos(idUsuario);
         getGeneros();
         desktop.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -58,6 +65,8 @@ public final class Principal extends javax.swing.JFrame {
         cbFiltro = new javax.swing.JComboBox();
         jButton1 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tbTop10 = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu2 = new javax.swing.JMenu();
         menuSair = new javax.swing.JMenu();
@@ -103,7 +112,7 @@ public final class Principal extends javax.swing.JFrame {
                 .addComponent(cbFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jButton1)
-                .addContainerGap(389, Short.MAX_VALUE))
+                .addContainerGap(387, Short.MAX_VALUE))
         );
         pnFiltroLayout.setVerticalGroup(
             pnFiltroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -118,18 +127,66 @@ public final class Principal extends javax.swing.JFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Top 10 Leitores", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11), new java.awt.Color(162, 67, 173))); // NOI18N
         jPanel1.setForeground(new java.awt.Color(162, 67, 173));
 
+        tbTop10.setFont(new java.awt.Font("Tahoma", 0, 17)); // NOI18N
+        tbTop10.setForeground(new java.awt.Color(162, 67, 173));
+        tbTop10.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "Posição", "Nome", "Pontos"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tbTop10.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbTop10MouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tbTop10);
+        if (tbTop10.getColumnModel().getColumnCount() > 0) {
+            tbTop10.getColumnModel().getColumn(2).setResizable(false);
+        }
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 158, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1))
         );
 
         jMenu2.setText("Meu Perfil");
+        jMenu2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenu2MouseClicked(evt);
+            }
+        });
         jMenuBar1.add(jMenu2);
 
         menuSair.setText("Sair");
@@ -153,7 +210,7 @@ public final class Principal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(scroll)
                     .addComponent(pnFiltro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -201,12 +258,22 @@ public final class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_menuSairActionPerformed
 
     private void formFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusGained
-     
+
     }//GEN-LAST:event_formFocusGained
 
     private void formWindowGainedFocus(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowGainedFocus
         getAcervo();
+        getTop10();
     }//GEN-LAST:event_formWindowGainedFocus
+
+    private void tbTop10MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbTop10MouseClicked
+
+    }//GEN-LAST:event_tbTop10MouseClicked
+
+    private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu2MouseClicked
+        MeuPerfil mp = new MeuPerfil(idUser, nome);
+        mp.setVisible(true);
+    }//GEN-LAST:event_jMenu2MouseClicked
 
     /**
      * @param args the command line arguments
@@ -249,9 +316,11 @@ public final class Principal extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JMenu menuSair;
     private javax.swing.JPanel pnFiltro;
     private javax.swing.JScrollPane scroll;
+    private javax.swing.JTable tbTop10;
     // End of variables declaration//GEN-END:variables
 
     public void getAcervo() {
@@ -269,7 +338,7 @@ public final class Principal extends javax.swing.JFrame {
                 //System.out.println(res.getInt("id"));
                 try {
                     if (myLivros.contains(res.getInt("id"))) {
-                        
+
                         Livro l = new Livro(res.getInt("id"), html1 + "180" + html2 + res.getString("nome"), res.getString("sinopse"), res.getString("imagem"), res.getInt("paginas"), res.getString("autor"), res.getString("genero"), true, idUser);
                         lLivro.add(l);
                     } else {
@@ -342,5 +411,25 @@ public final class Principal extends javax.swing.JFrame {
             desktop.add(lLivro1);
         });
         desktop.updateUI();
+    }
+
+    private void getTop10() {
+        int posicao = 1;
+        DefaultTableModel tabela = ((DefaultTableModel) tbTop10.getModel());
+        tabela.setRowCount(0);
+        ResultSet resultados = udao.getTop10();
+        Object dados[] = new Object[3];
+        try {
+            while (resultados.next()) {
+                dados[0] = posicao;
+                dados[1] = resultados.getString("nome");
+                dados[2] = resultados.getString("pontos");
+                tabela.addRow(dados);
+                posicao++;
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

@@ -87,4 +87,16 @@ public class UsuarioDAO {
         sql = "insert INTO usuario_has_conquista (usuario_idusuario,conquista_idconquista) VALUES ('" + idUsuario + "','" + idConquista + "')";
         c.executarSql(sql);
     }
+
+    public ResultSet getTop10() {
+        sql = "select usuario.idusuario, usuario.nome, usuario.pontos from usuario ORDER by usuario.pontos DESC LIMIT 10";
+        ResultSet res = c.executarConsulta(sql);
+        return res;
+    }
+
+    public ResultSet getMyConquistas(int idUsuario) {
+        sql = "select conquista.nome, conquista.imagem from conquista INNER JOIN usuario_has_conquista on conquista.idconquista = usuario_has_conquista.conquista_idconquista INNER JOIN usuario ON usuario.idusuario = usuario_has_conquista.usuario_idusuario WHERE usuario.idusuario ='" + idUsuario + "'";
+        ResultSet res = c.executarConsulta(sql);
+        return res;
+    }
 }

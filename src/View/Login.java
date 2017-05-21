@@ -169,7 +169,7 @@ public class Login extends javax.swing.JFrame {
                     txtSenha.setText("");
                 }
                 if (res.next()) {
-                    Principal principal = new Principal(res.getInt("idusuario"));
+                    Principal principal = new Principal(res.getInt("idusuario"), res.getString("nome"));
                     principal.setVisible(true);
                     dispose();
                 }

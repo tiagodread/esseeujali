@@ -146,7 +146,7 @@ public class SingleLivro extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btJaLiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btJaLiActionPerformed
-
+        
         int pontos = Util.getPontos(livro.getPaginas()) + udao.getPontos(idUser);
         udao.setPontos(pontos, idUser);
         ldao.setLivroLido(idUser, livro.getId());

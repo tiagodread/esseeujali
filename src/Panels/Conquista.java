@@ -44,11 +44,10 @@ public class Conquista extends javax.swing.JPanel {
         img.setBackground(new java.awt.Color(153, 255, 255));
         img.setForeground(new java.awt.Color(102, 255, 51));
         img.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        img.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/quadrinho_icon.png"))); // NOI18N
+        img.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/conquistas/quadrinho_icon.png"))); // NOI18N
 
         tituloConquista.setFont(new java.awt.Font("Verdana", 1, 14)); // NOI18N
         tituloConquista.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        tituloConquista.setText("Leitor de Quadrinhos");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -62,8 +61,8 @@ public class Conquista extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(img, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(tituloConquista)
-                .addGap(0, 27, Short.MAX_VALUE))
+                .addComponent(tituloConquista, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
