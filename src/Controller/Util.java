@@ -30,4 +30,9 @@ public class Util {
         return sen;
     }
 
+    public static int getPontos(int paginasLivro) {
+        int pontos = (int) paginasLivro / 100;
+        return pontos + 1;
+    }
+
 }

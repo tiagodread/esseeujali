@@ -5,7 +5,10 @@
  */
 package View;
 
+import Controller.Util;
 import DAO.LivroDAO;
+import DAO.UsuarioDAO;
+import Model.ConquistaModel;
 import Model.LivroModel;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -23,11 +26,18 @@ public class SingleLivro extends javax.swing.JFrame {
      */
     private LivroModel livro = null;
     private final int idUser;
+    private final ImageIcon imagem;
+    LivroDAO ldao = new LivroDAO();
+    UsuarioDAO udao = new UsuarioDAO();
+    ConquistaModel cm = null;
 
     public SingleLivro(LivroModel livro, int idUsuario) {
-        this.idUser = idUsuario;
         initComponents();
+        this.idUser = idUsuario;
         this.livro = livro;
+        cm = udao.getConquista(livro.getGenero());
+        this.imagem = new ImageIcon(getClass().getResource(cm.getImagem()));
+        imagem.getImage().flush();
         populaLivro(livro);
     }
 
@@ -116,12 +126,12 @@ public class SingleLivro extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(tituloLivro, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(autorLivro, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(paginasLivro, javax.swing.GroupLayout.DEFAULT_SIZE, 20, Short.MAX_VALUE)
+                .addComponent(tituloLivro, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
+                .addComponent(autorLivro, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(paginasLivro, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(pnImagem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
@@ -136,10 +146,18 @@ public class SingleLivro extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btJaLiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btJaLiActionPerformed
-        LivroDAO ldao = new LivroDAO();
+
+        int pontos = Util.getPontos(livro.getPaginas()) + udao.getPontos(idUser);
+        udao.setPontos(pontos, idUser);
         ldao.setLivroLido(idUser, livro.getId());
         JOptionPane.showMessageDialog(null, "O livro foi marcado como lido!");
         btJaLi.setEnabled(false);
+
+        int qtdLivros = udao.getQTDLivrosGenero(idUser, livro.getGenero());
+        if (qtdLivros == 5) {
+            udao.setConquista(idUser, cm.getId());
+            JOptionPane.showMessageDialog(null, "Parabéns, você leu " + qtdLivros + " ou mais livros do gênero " + livro.getGenero() + ". Você ganhou a conquista: Leitor de " + livro.getGenero() + "\n Veja todas as conquistas no seu perfil.", null, JOptionPane.INFORMATION_MESSAGE, imagem);
+        }
     }//GEN-LAST:event_btJaLiActionPerformed
 
     /**
